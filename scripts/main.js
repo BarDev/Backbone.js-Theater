@@ -26,9 +26,9 @@ Theater.Views.Movies = Backbone.View.extend({
     //collection: new Theater.Collections.Movies(), //Not needed
 
     initialize: function () {
-        _.bindAll(this, "render", "addOne", "addAll");
-        this.collection.bind("reset", this.render);
-        this.collection.bind("add", this.addOne);
+        //_.bindAll(this, "render", "addOne", "addAll");
+        this.collection.bind("reset", this.render, this);
+        this.collection.bind("add", this.addOne, this);
     },
 
     render: function () {
@@ -54,19 +54,25 @@ Theater.Views.Movies = Backbone.View.extend({
 
 Theater.Templates.movie = _.template($("#tmplt-Movie").html())
 Theater.Views.Movie = Backbone.View.extend({
+    tagName: "li",
     template: Theater.Templates.movie,
+    //events: { "click .delete": "test" },
 
     initialize: function () {
-        _.bindAll(this, 'render');
+        //_.bindAll(this, 'render', 'test');
+        this.model.bind('destroy', this.destroyItem, this);
+        this.model.bind('remove', this.removeItem, this);
     },
 
     render: function () {
-        return this.template(this.model.toJSON()); ;
+        return $(this.el).append(this.template(this.model.toJSON())) ;
+    },
+
+    removeItem: function (model) {
+        console.log("Remove - " + model.get("Name"))
+        this.remove();
     }
 })
-
-
-
 
 
 Theater.Router = Backbone.Router.extend({
